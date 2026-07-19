@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NovaVault | Premium Digital Store</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+:root{--red:#ef4444;--orange:#f97316}
+*{box-sizing:border-box;scroll-behavior:smooth}
+body{margin:0;min-height:100vh;color:#fff;font-family:Inter,system-ui,sans-serif;background:radial-gradient(circle at top,#1c0909 0%,#070202 65%,#000 100%);transition:.3s}
+body.light{color:#18181b;background:#f4f4f5}
+.glass{background:rgba(15,10,10,.68);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(16px)}
+.light .glass{background:rgba(255,255,255,.82);border-color:rgba(0,0,0,.08)}
+.card{background:linear-gradient(145deg,rgba(255,255,255,.06),rgba(255,255,255,.015));border:1px solid rgba(255,255,255,.08);transition:.35s;animation:in .55s both}
+.light .card{background:rgba(255,255,255,.85);border-color:rgba(0,0,0,.08)}
+.card:hover{transform:translateY(-8px);border-color:rgba(239,68,68,.55);box-shadow:0 18px 50px rgba(0,0,0,.35),0 0 28px rgba(239,68,68,.12)}
+@keyframes in{from{opacity:0;transform:translateY(20px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.float{animation:float 3s ease-in-out infinite}.spinner{animation:spin 1s linear infinite}
+.modal{opacity:0;pointer-events:none;transition:.3s}.modal.active{opacity:1;pointer-events:auto}.modal>div{transform:scale(.92) translateY(15px);transition:.35s}.modal.active>div{transform:none}
+.drawer{transform:translateX(100%);transition:.4s}.drawer.active{transform:none}
+.toast{animation:in .3s both}
+@media(max-width:768px){body{padding-bottom:70px}.mobile-nav{display:flex!important}}
+</style>
+</head>
+<body class="p-4 md:p-8">
+
+<header class="glass max-w-7xl mx-auto mb-8 p-4 rounded-2xl flex justify-between items-center gap-4 sticky top-3 z-40">
+  <div class="flex items-center gap-3">
+    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-red-600 to-orange-500 flex items-center justify-center text-xl float">✦</div>
+    <div><h1 class="text-xl font-black tracking-widest bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 bg-clip-text text-transparent">NOVAVAULT</h1><p class="text-[10px] text-zinc-500 tracking-widest">PREMIUM DIGITAL MARKETPLACE</p></div>
+  </div>
+  <div class="hidden md:flex items-center gap-3">
+    <span class="text-xs text-zinc-400">🟢 <span id="online">127</span> users online</span>
+    <button onclick="toggleTheme()" class="w-10 h-10 rounded-xl bg-zinc-900/70">☀️</button>
+    <button onclick="openWishlist()" class="relative w-10 h-10 rounded-xl bg-zinc-900/70">❤️<b id="wish-count" class="hidden absolute -top-1 -right-1 bg-red-600 text-[9px] px-1.5 rounded-full">0</b></button>
+    <button onclick="openCart()" class="px-4 py-2.5 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-xs font-black">🛒 Cart <span id="cart-count">0</span></button>
+  </div>
+  <button onclick="openCart()" class="md:hidden relative text-xl">🛒<span id="mobile-cart" class="absolute -top-2 -right-2 bg-red-600 text-[9px] px-1.5 rounded-full">0</span></button>
+</header>
+
+<section class="max-w-7xl mx-auto mb-8">
+  <div class="glass rounded-3xl p-7 md:p-10">
+    <span class="inline-block bg-red-950/40 border border-red-900/40 rounded-full px-3 py-1.5 text-[10px] text-red-400 font-black tracking-widest mb-5">⚡ NEW SEASON COLLECTION</span>
+    <h2 class="text-3xl md:text-5xl font-black">Your digital world. <span class="bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400 bg-clip-text text-transparent">Upgraded.</span></h2>
+    <p class="text-sm text-zinc-400 mt-4 max-w-xl">Discover premium digital products, gift cards and gaming essentials with a fast, clean shopping experience.</p>
+    <button onclick="document.getElementById('store').scrollIntoView()" class="mt-6 px-5 py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-xs font-black">Explore Store →</button>
+  </div>
+</section>
+
+<section class="max-w-7xl mx-auto mb-8 grid grid-cols-2 md:grid-cols-4 gap-3">
+  <div class="glass rounded-2xl p-4"><p class="text-[10px] text-zinc-500">PRODUCTS</p><b class="text-2xl">50+</b></div>
+  <div class="glass rounded-2xl p-4"><p class="text-[10px] text-zinc-500">ORDERS</p><b class="text-2xl">24.8K</b></div>
+  <div class="glass rounded-2xl p-4"><p class="text-[10px] text-zinc-500">TRUST SCORE</p><b class="text-2xl text-emerald-400">98.7%</b></div>
+  <div class="glass rounded-2xl p-4"><p class="text-[10px] text-zinc-500">SUPPORT</p><b class="text-2xl">24/7</b></div>
+</section>
+
+<section id="store" class="max-w-7xl mx-auto mb-7">
+  <div class="glass rounded-3xl p-4 md:p-6">
+    <div class="flex flex-col lg:flex-row gap-4">
+      <input id="search" oninput="applyFilters()" placeholder="🔍 Search products..." class="flex-1 bg-zinc-950/60 border border-zinc-800 rounded-xl py-3 px-4 text-sm outline-none focus:border-red-500">
+      <select id="sort" onchange="applyFilters()" class="bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3 text-xs font-bold">
+        <option value="featured">✨ Featured</option><option value="low">Price: Low to High</option><option value="high">Price: High to Low</option><option value="rating">Highest Rated</option>
+      </select>
+    </div>
+    <div class="flex flex-wrap gap-2 mt-5">
+      <button class="cat active px-4 py-2 rounded-xl text-xs font-black bg-red-600" data-cat="ALL" onclick="setCategory('ALL')">🔥 All</button>
+      <button class="cat px-4 py-2 rounded-xl text-xs font-black bg-zinc-900 text-zinc-400" data-cat="GIFT" onclick="setCategory('GIFT')">🎁 Gift Cards</button>
+      <button class="cat px-4 py-2 rounded-xl text-xs font-black bg-zinc-900 text-zinc-400" data-cat="GAME" onclick="setCategory('GAME')">🎮 Gaming</button>
+      <button class="cat px-4 py-2 rounded-xl text-xs font-black bg-zinc-900 text-zinc-400" data-cat="SOFTWARE" onclick="setCategory('SOFTWARE')">💻 Software</button>
+      <button class="cat px-4 py-2 rounded-xl text-xs font-black bg-zinc-900 text-zinc-400" data-cat="SUBSCRIPTION" onclick="setCategory('SUBSCRIPTION')">⭐ Subscriptions</button>
+      <button class="cat px-4 py-2 rounded-xl text-xs font-black bg-zinc-900 text-zinc-400" data-cat="DIGITAL" onclick="showDigitalProducts()">💳 Digital Cards</button>
+      <button class="cat px-4 py-2 rounded-xl text-xs font-black bg-zinc-900 text-zinc-400" data-cat="GIFT50" onclick="showGiftCards()">🎁 Gift Cards (50)</button>
+      <button class="cat px-4 py-2 rounded-xl text-xs font-black bg-zinc-900 text-zinc-400" data-cat="CARD50" onclick="showPremiumCards()">💳 Premium Cards (50)</button>
+      <span class="ml-auto text-xs text-zinc-500"><span id="result-count">0</span> products</span>
+    </div>
+  </div>
+</section>
+
+
+<section id="card-store" class="max-w-7xl mx-auto mb-8 hidden">
+  <div class="glass rounded-3xl p-5 mb-5 flex flex-col md:flex-row justify-between gap-4 items-center">
+    <div>
+      <h2 class="text-2xl font-black">💳 Premium Digital Cards</h2>
+      <p class="text-xs text-zinc-500 mt-1">50 safe demo digital voucher cards with different values</p>
+    </div>
+    <button onclick="showStore()" class="px-4 py-3 rounded-xl bg-zinc-900 text-xs font-black">← Back to Store</button>
+  </div>
+  <div id="card-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+</section>
+
+<main id="grid" class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></main>
+
+<section class="max-w-7xl mx-auto mt-10">
+  <div class="glass rounded-3xl p-5">
+    <div class="flex justify-between mb-4"><h3 class="font-black text-sm">⚡ Live Activity</h3><span class="text-[10px] text-emerald-400">● LIVE</span></div>
+    <div id="activity" class="space-y-3"></div>
+  </div>
+</section>
+
+<div id="cart-overlay" onclick="closeCart()" class="fixed inset-0 bg-black/70 z-50 opacity-0 pointer-events-none transition-opacity"></div>
+<aside id="drawer" class="drawer fixed right-0 top-0 bottom-0 w-full sm:w-[430px] bg-zinc-950 border-l border-zinc-800 z-[60] p-5 overflow-y-auto">
+  <div class="flex justify-between items-center mb-6"><div><h2 class="text-xl font-black">Your Cart</h2><p class="text-xs text-zinc-500"><span id="drawer-count">0</span> item(s)</p></div><button onclick="closeCart()" class="text-2xl text-zinc-500">×</button></div>
+  <div id="cart-items"></div>
+  <div id="empty-cart" class="text-center py-16 text-zinc-500"><div class="text-5xl mb-4">🛒</div><b>Your cart is empty</b></div>
+  <div id="summary" class="hidden border-t border-zinc-800 mt-6 pt-5">
+    <div class="flex gap-2 mb-4"><input id="coupon" placeholder="Coupon code" class="flex-1 bg-zinc-900 border border-zinc-800 rounded-xl px-3 py-3 text-xs"><button onclick="applyCoupon()" class="px-4 rounded-xl bg-zinc-800 text-xs font-black">Apply</button></div>
+    <p id="coupon-msg" class="text-xs mb-3"></p>
+    <div class="flex justify-between text-xs text-zinc-500"><span>Subtotal</span><span id="subtotal">₹0</span></div>
+    <div class="flex justify-between text-xs text-emerald-400 mt-2"><span>Discount</span><span id="discount">-₹0</span></div>
+    <div class="flex justify-between text-lg font-black border-t border-zinc-800 pt-3 mt-3"><span>Total</span><span id="total" class="text-yellow-400">₹0</span></div>
+    <button onclick="openPayment()" class="w-full mt-5 py-4 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-sm font-black">Proceed to Payment →</button>
+  </div>
+</aside>
+
+<div id="payment-modal" class="modal fixed inset-0 bg-black/85 backdrop-blur-md z-[80] flex items-center justify-center p-4">
+<div class="glass rounded-3xl max-w-md w-full p-6">
+  <div id="pay-form">
+    <div class="flex justify-between items-center mb-6"><div><h2 class="text-xl font-black">💳 Payment</h2><p class="text-xs text-zinc-500">Complete your order payment</p></div><button onclick="closePayment()" class="text-2xl text-zinc-500">×</button></div>
+    <div class="bg-zinc-900 rounded-2xl p-5 text-center mb-5"><p class="text-[10px] text-zinc-500 font-black">AMOUNT TO PAY</p><div id="pay-total" class="text-3xl font-black text-yellow-400 mt-2">₹0</div></div>
+    <div class="bg-zinc-900 rounded-2xl p-4 mb-5"><p class="text-[10px] text-zinc-500 font-black mb-2">UPI ID</p><div class="flex justify-between items-center"><code class="text-emerald-400 font-black">vardan7@fam</code><button onclick="copyUPI()" class="px-3 py-2 rounded-lg bg-zinc-800 text-xs font-black">COPY</button></div></div>
+    <input id="customer-email" type="email" placeholder="Enter your email address" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm outline-none focus:border-red-500 mb-3">
+    <input id="customer-phone" type="tel" placeholder="Enter your phone number" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm outline-none focus:border-red-500 mb-3">
+    <input id="reference" placeholder="Enter payment reference / transaction ID" class="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-3 text-sm outline-none focus:border-red-500">
+    <button onclick="submitPayment()" class="w-full mt-4 py-4 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 text-sm font-black">I HAVE PAID — SUBMIT</button>
+  </div>
+  <div id="pay-processing" class="hidden text-center py-10"><div class="w-20 h-20 mx-auto border-4 border-yellow-500 border-t-transparent rounded-full spinner"></div><h2 class="text-xl font-black text-yellow-400 mt-6">YOUR PAYMENT IS PROCESSING</h2><p class="text-xs text-zinc-500 mt-3">Your payment is currently under review. Please keep this window open.</p></div>
+  <div id="pay-approved" class="hidden text-center py-8"><div class="text-7xl mb-5">✅</div><h2 class="text-2xl md:text-3xl font-black text-emerald-400">PAYMENT APPROVED</h2><p class="text-lg font-black mt-5">WAIT FOR 2 MINUTES</p><p class="text-sm text-zinc-400 mt-3">YOUR ORDER DELIVERED IN YOUR MAIL</p></div>
+  <div id="pay-rejected" class="hidden text-center py-10"><div class="text-7xl mb-5">❌</div><h2 class="text-3xl font-black text-red-500">REJECTED</h2><p class="text-sm text-zinc-500 mt-4">Your payment review was not approved.</p><button onclick="resetPayment()" class="mt-6 px-6 py-3 rounded-xl bg-red-600 text-xs font-black">TRY AGAIN</button></div>
+</div>
+</div>
+
+<div id="product-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+<div class="glass rounded-3xl max-w-lg w-full p-6">
+  <div class="flex justify-between"><div><span id="m-badge" class="text-[10px] text-red-400 font-black"></span><h2 id="m-title" class="text-2xl font-black mt-2"></h2></div><button onclick="closeProduct()" class="text-2xl text-zinc-500">×</button></div>
+  <div id="m-icon" class="text-7xl text-center py-8 float"></div><p id="m-desc" class="text-sm text-zinc-400"></p>
+  <div class="flex justify-between items-center mt-7"><span id="m-price" class="text-2xl font-black text-yellow-400"></span><button id="m-add" class="px-5 py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-xs font-black">Add to Cart</button></div>
+</div>
+</div>
+
+<div id="wish-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+<div class="glass rounded-3xl max-w-2xl w-full p-6"><div class="flex justify-between mb-6"><h2 class="text-xl font-black">❤️ Wishlist</h2><button onclick="closeWishlist()" class="text-2xl text-zinc-500">×</button></div><div id="wish-items" class="grid sm:grid-cols-2 gap-3"></div></div>
+</div>
+
+
+<button onclick="openAdminPanel()" class="fixed bottom-5 left-5 z-40 px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800 text-[10px] font-black shadow-xl">🔐 Admin Panel</button>
+
+<div id="orders-modal" class="modal fixed inset-0 bg-black/80 backdrop-blur-md z-[70] flex items-center justify-center p-4">
+<div class="glass rounded-3xl max-w-2xl w-full p-6 max-h-[90vh] overflow-y-auto"><div class="flex justify-between mb-6"><h2 class="text-xl font-black">📦 Order History</h2><button onclick="closeOrders()" class="text-2xl text-zinc-500">×</button></div><div id="orders"></div></div>
+</div>
+
+
+<div id="admin-modal" class="modal fixed inset-0 bg-black/85 backdrop-blur-md z-[90] flex items-center justify-center p-4">
+<div class="glass rounded-3xl max-w-3xl w-full p-6 max-h-[90vh] overflow-y-auto">
+  <div class="flex justify-between items-center mb-5">
+    <div><h2 class="text-xl font-black">🔐 Admin Panel</h2><p class="text-xs text-zinc-500">Local demo order review panel</p></div>
+    <button onclick="closeAdminPanel()" class="text-2xl text-zinc-500">×</button>
+  </div>
+  <div class="grid grid-cols-3 gap-3 mb-5">
+    <div class="bg-zinc-900 rounded-2xl p-3"><p class="text-[9px] text-zinc-500">PENDING</p><b id="admin-pending">0</b></div>
+    <div class="bg-zinc-900 rounded-2xl p-3"><p class="text-[9px] text-zinc-500">APPROVED</p><b id="admin-approved" class="text-emerald-400">0</b></div>
+    <div class="bg-zinc-900 rounded-2xl p-3"><p class="text-[9px] text-zinc-500">REJECTED</p><b id="admin-rejected" class="text-red-400">0</b></div>
+  </div>
+  <div id="admin-orders"></div>
+</div>
+</div>
+
+<div id="toast" class="fixed right-4 bottom-5 z-[100] space-y-3"></div>
+<nav class="mobile-nav hidden fixed bottom-0 left-0 right-0 z-40 glass px-5 py-3 justify-around"><button onclick="window.scrollTo({top:0,behavior:'smooth'})">🏠<small class="block text-[9px]">Home</small></button><button onclick="document.getElementById('store').scrollIntoView()">🛍️<small class="block text-[9px]">Store</small></button><button onclick="openWishlist()">❤️<small class="block text-[9px]">Saved</small></button><button onclick="openOrders()">📦<small class="block text-[9px]">Orders</small></button></nav>
+
+<script>
+const products=[
+["Ultimate Gaming Gift Card","GIFT","🎮",499,599,4.9,"Best Seller"],
+["Premium Game Pass","SUBSCRIPTION","⭐",799,999,4.8,"Popular"],
+["Creator Pro Toolkit","SOFTWARE","💻",699,899,4.7,"New"],
+["Mobile Gaming Credits","GAME","📱",299,399,4.6,"Hot"],
+["Streaming Premium Pass","SUBSCRIPTION","🍿",549,699,4.8,"Trending"],
+["Digital Shopping Voucher","GIFT","🎁",999,1199,4.9,"Premium"],
+["Game Expansion Pack","GAME","🕹️",449,599,4.5,"Limited"],
+["Cloud Storage Upgrade","SOFTWARE","☁️",399,499,4.7,"Value"]
+].map((x,i)=>({id:i+1,title:x[0],category:x[1],icon:x[2],price:x[3],oldPrice:x[4],rating:x[5],badge:x[6],description:"Premium legal digital product with convenient digital delivery."}));
+
+const digitalProducts=Array.from({length:50},(_,i)=>({id:"digital_"+(i+1),title:["Gaming Gift Card","Mobile Game Credits","Premium Game Pass","Streaming Voucher","Creator Toolkit"][i%5]+" #"+(i+1),category:"DIGITAL",icon:["🎮","🎁","⭐","💻","📱"][i%5],price:199+Math.floor(Math.random()*900),rating:(4.5+Math.random()*.5).toFixed(1),badge:"Digital",description:"Legal digital product with convenient digital delivery."}));
+
+let cart=[],wishlist=[],orders=JSON.parse(localStorage.getItem("nv_orders")||"[]"),category="ALL",discount=0,currentOrder=null;
+
+const money=n=>"₹"+n.toLocaleString("en-IN");
+function toast(msg){const e=document.createElement("div");e.className="toast glass rounded-2xl px-4 py-3 text-xs font-bold";e.innerText="✓  "+msg;document.getElementById("toast").appendChild(e);setTimeout(()=>e.remove(),3000)}
+function setCategory(c){category=c;document.querySelectorAll(".cat").forEach(b=>{const a=b.dataset.cat===c;b.classList.toggle("bg-red-600",a);b.classList.toggle("text-white",a);b.classList.toggle("bg-zinc-900",!a);b.classList.toggle("text-zinc-400",!a)});applyFilters()}
+function applyFilters(){const q=document.getElementById("search").value.toLowerCase(),s=document.getElementById("sort").value;let list=products.filter(p=>(category==="ALL"||p.category===category)&&(p.title.toLowerCase().includes(q)||p.description.toLowerCase().includes(q)));if(s==="low")list.sort((a,b)=>a.price-b.price);if(s==="high")list.sort((a,b)=>b.price-a.price);if(s==="rating")list.sort((a,b)=>b.rating-a.rating);render(list)}
+function render(list){document.getElementById("result-count").innerText=list.length;document.getElementById("grid").innerHTML=list.map((p,i)=>`<div class="card rounded-3xl p-5" style="animation-delay:${i*50}ms"><div class="flex justify-between"><span class="text-[9px] text-red-400 font-black uppercase">${p.badge}</span><button onclick="toggleWish(${p.id})">${wishlist.includes(p.id)?"❤️":"♡"}</button></div><div onclick="openProduct(${p.id})" class="cursor-pointer"><div class="text-7xl text-center py-7 float">${p.icon}</div><div class="text-yellow-400 text-xs">★ ${p.rating}</div><h3 class="font-black text-lg mt-2">${p.title}</h3><p class="text-xs text-zinc-500 mt-2">${p.description}</p></div><div class="flex justify-between items-end mt-5"><div><span class="text-xl font-black text-yellow-400">${money(p.price)}</span><span class="text-xs text-zinc-600 line-through ml-2">${money(p.oldPrice)}</span></div><button onclick="add(${p.id})" class="px-4 py-3 rounded-xl bg-gradient-to-r from-red-600 to-orange-500 text-[10px] font-black">+ ADD</button></div></div>`).join("")}
+
+const giftCards=Array.from({length:50},(_,i)=>({
+  id:"gift_"+(i+1),
+  title:["Gaming Gift Card","Shopping Gift Card","Streaming Gift Card","Music Gift Card","App Store Gift Card"][i%5]+" #"+(i+1),
+  category:"GIFT50",
+  icon:["🎁","🎮","🛍️","🎬","🎵"][i%5],
+  price:[199,299,399,499,599,799,999,1499,1999,2499][i%10],
+  rating:(4.5+Math.random()*.5).toFixed(1),
+  badge:"Gift Card",
+  description:"Legal digital gift card with digital delivery after order confirmation."
+}));
+
+
+const premiumCards=Array.from({length:50},(_,i)=>{
+  const brands=["MASTERCARD","AMEX","VISA","RUPAY"];
+  const colors=["gold","purple","blue","violet"];
+  const values=[199,249,299,349,399,449,499,599,699,799,999,1299,1499,1999,2499];
+  const n=i+1;
+  const brand=brands[i%brands.length];
+  return {
+    id:"premium_"+n,
+    brand,
+    color:colors[i%colors.length],
+    price:values[i%values.length],
+    number:`${String(5301+i).padStart(4,"0")} ${String(7203+i*7).slice(-4)} ${String(9802+i*13).slice(-4)} XXXX`,
+    exp:`${String((i%12)+1).padStart(2,"0")}/${String(26+(i%6))}`,
+    value:values[(i+5)%values.length]*100,
+    label:"DIGITAL VOUCHER"
+  };
+});
+
+function showPremiumCards(){
+  document.getElementById("store").classList.add("hidden");
+  document.getElementById("grid").classList.add("hidden");
+  document.getElementById("card-store").classList.remove("hidden");
+  document.getElementById("card-grid").innerHTML=premiumCards.map((p,i)=>`
+    <div class="card rounded-2xl p-5" style="animation-delay:${i*25}ms">
+      <div class="flex justify-between items-center">
+        <span class="px-3 py-1.5 rounded-lg text-[10px] font-black ${p.color==="gold"?"bg-yellow-950 text-yellow-400":p.color==="purple"?"bg-purple-950 text-purple-400":p.color==="blue"?"bg-blue-950 text-blue-400":"bg-violet-950 text-violet-400"}">${p.brand}</span>
+        <span class="px-3 py-1.5 rounded-lg bg-zinc-900 text-[10px] font-black">${money(p.price)}</span>
+      </div>
+      <div class="mt-5 text-lg tracking-[.22em] font-black text-zinc-300">${p.number}</div>
+      <div class="border-t border-zinc-800 mt-5 pt-4 grid grid-cols-3 gap-2 text-[9px]">
+        <div><span class="text-zinc-600 block">EXP</span><b>${p.exp}</b></div>
+        <div><span class="text-zinc-600 block">VALUE</span><b class="text-emerald-400">${money(p.value)}</b></div>
+        <div><span class="text-zinc-600 block">TYPE</span><b>${p.label}</b></div>
+      </div>
+      <button onclick="addPremiumCard('${p.id}')" class="w-full mt-5 py-3 rounded-xl bg-zinc-900 border border-zinc-800 text-xs font-black hover:border-red-500 transition">👜 Add To Cart</button>
+    </div>`).join("");
+  document.getElementById("card-grid").scrollIntoView({behavior:"smooth"});
+}
+
+function addPremiumCard(id){
+  const p=premiumCards.find(x=>x.id===id);
+  addItem({...p,title:`${p.brand} Digital Voucher #${id.split("_")[1]}`,icon:"💳",description:"Safe digital voucher product."});
+  toast("Digital voucher added to cart");
+}
+
+function showStore(){
+  document.getElementById("card-store").classList.add("hidden");
+  document.getElementById("store").classList.remove("hidden");
+  document.getElementById("grid").classList.remove("hidden");
+  setCategory("ALL");
+}
+
+function showGiftCards(){
+  document.getElementById("grid").innerHTML=giftCards.map((p,i)=>`
+    <div class="card rounded-2xl p-4" style="animation-delay:${i*25}ms">
+      <div class="text-5xl text-center py-5">${p.icon}</div>
+      <div class="flex justify-between items-center">
+        <span class="text-[9px] text-red-400 font-black">GIFT CARD</span>
+        <span class="text-[10px] text-yellow-400 font-black">★ ${p.rating}</span>
+      </div>
+      <h3 class="font-black text-sm mt-3">${p.title}</h3>
+      <p class="text-[10px] text-zinc-500 mt-2">${p.description}</p>
+      <div class="flex justify-between items-center mt-4">
+        <b class="text-lg text-yellow-400">${money(p.price)}</b>
+        <button onclick="addGift('${p.id}')" class="px-3 py-2 rounded-lg bg-gradient-to-r from-red-600 to-orange-500 text-[10px] font-black">ADD</button>
+      </div>
+    </div>`).join("");
+  document.getElementById("result-count").innerText=50;
+  document.getElementById("store").scrollIntoView({behavior:"smooth"});
+}
+
+function addGift(id){
+  const p=giftCards.find(x=>x.id===id);
+  addItem(p);
+  toast(p.title+" added to cart");
+}
+
+function showDigitalProducts(){document.getElementById("grid").innerHTML=digitalProducts.map((p,i)=>`<div class="card rounded-2xl p-4" style="animation-delay:${i*25}ms"><div class="text-5xl text-center py-5">${p.icon}</div><span class="text-[9px] text-red-400 font-black">DIGITAL PRODUCT</span><h3 class="font-black text-sm mt-3">${p.title}</h3><p class="text-[10px] text-zinc-500 mt-2">${p.description}</p><div class="flex justify-between items-center mt-4"><b class="text-lg text-yellow-400">${money(p.price)}</b><button onclick="addDigital('${p.id}')" class="px-3 py-2 rounded-lg bg-gradient-to-r from-red-600 to-orange-500 text-[10px] font-black">ADD</button></div></div>`).join("");document.getElementById("result-count").innerText=50;document.getElementById("store").scrollIntoView({behavior:"smooth"})}
+function add(id){const p=products.find(x=>x.id===id);addItem(p);toast(p.title+" added to cart")}
+function addDigital(id){const p=digitalProducts.find(x=>x.id===id);addItem(p);toast(p.title+" added to cart")}
+function addItem(p){const x=cart.find(i=>i.id===p.id);x?x.qty++:cart.push({...p,qty:1});updateCart()}
+function updateCart(){const n=cart.reduce((a,b)=>a+b.qty,0);["cart-count","mobile-cart","drawer-count"].forEach(id=>document.getElementById(id).innerText=n);const box=document.getElementById("cart-items");document.getElementById("empty-cart").classList.toggle("hidden",!!cart.length);document.getElementById("summary").classList.toggle("hidden",!cart.length);box.innerHTML=cart.map(i=>`<div class="bg-zinc-900 rounded-2xl p-3 mb-3 flex gap-3"><div class="text-3xl">${i.icon}</div><div class="flex-1"><b class="text-xs">${i.title}</b><p class="text-yellow-400 text-xs">${money(i.price)}</p><div class="flex gap-3 mt-2"><button onclick="qty('${i.id}',-1)" class="w-7 h-7 bg-zinc-800 rounded">−</button><span>${i.qty}</span><button onclick="qty('${i.id}',1)" class="w-7 h-7 bg-zinc-800 rounded">+</button><button onclick="removeItem('${i.id}')" class="ml-auto text-red-400 text-xs">Remove</button></div></div></div>`).join("");const sub=cart.reduce((a,b)=>a+b.price*b.qty,0),dis=Math.round(sub*discount/100);document.getElementById("subtotal").innerText=money(sub);document.getElementById("discount").innerText="-"+money(dis);document.getElementById("total").innerText=money(sub-dis)}
+function qty(id,n){const x=cart.find(i=>i.id==id);if(!x)return;x.qty+=n;if(x.qty<=0)removeItem(id);else updateCart()}
+function removeItem(id){cart=cart.filter(i=>i.id!=id);updateCart()}
+function openCart(){document.getElementById("drawer").classList.add("active");document.getElementById("cart-overlay").classList.remove("opacity-0","pointer-events-none")}
+function closeCart(){document.getElementById("drawer").classList.remove("active");document.getElementById("cart-overlay").classList.add("opacity-0","pointer-events-none")}
+function applyCoupon(){const c=document.getElementById("coupon").value.toUpperCase();discount=c==="NOVA10"?10:c==="VIP20"?20:0;document.getElementById("coupon-msg").innerText=discount?discount+"% discount applied":"Invalid coupon";document.getElementById("coupon-msg").className=discount?"text-xs mb-3 text-emerald-400":"text-xs mb-3 text-red-400";updateCart()}
+function openProduct(id){const p=products.find(x=>x.id===id);document.getElementById("m-badge").innerText=p.badge;document.getElementById("m-title").innerText=p.title;document.getElementById("m-icon").innerText=p.icon;document.getElementById("m-desc").innerText=p.description;document.getElementById("m-price").innerText=money(p.price);document.getElementById("m-add").onclick=()=>{add(p.id);closeProduct()};document.getElementById("product-modal").classList.add("active")}
+function closeProduct(){document.getElementById("product-modal").classList.remove("active")}
+function toggleWish(id){wishlist.includes(id)?wishlist=wishlist.filter(x=>x!==id):wishlist.push(id);document.getElementById("wish-count").innerText=wishlist.length;document.getElementById("wish-count").classList.toggle("hidden",!wishlist.length);applyFilters()}
+function openWishlist(){document.getElementById("wish-items").innerHTML=products.filter(p=>wishlist.includes(p.id)).map(p=>`<div class="bg-zinc-900 rounded-2xl p-4 flex items-center gap-3"><span class="text-4xl">${p.icon}</span><div class="flex-1"><b class="text-xs">${p.title}</b><p class="text-yellow-400">${money(p.price)}</p></div><button onclick="add(${p.id})" class="bg-red-600 px-3 py-2 rounded text-[10px]">ADD</button></div>`).join("")||`<p class="text-center text-zinc-500 col-span-full py-10">Your wishlist is empty.</p>`;document.getElementById("wish-modal").classList.add("active")}
+function closeWishlist(){document.getElementById("wish-modal").classList.remove("active")}
+function openPayment(){if(!cart.length)return toast("Your cart is empty");currentOrder={id:"NV-"+Math.floor(100000+Math.random()*900000),amount:cart.reduce((a,b)=>a+b.price*b.qty,0)-Math.round(cart.reduce((a,b)=>a+b.price*b.qty,0)*discount/100)};document.getElementById("pay-total").innerText=money(currentOrder.amount);resetPayment();closeCart();document.getElementById("payment-modal").classList.add("active")}
+function closePayment(){document.getElementById("payment-modal").classList.remove("active")}
+function copyUPI(){navigator.clipboard.writeText("vardan7@fam");toast("UPI ID copied")}
+async function submitPayment(){
+  const reference=document.getElementById("reference").value.trim();
+  const email=document.getElementById("customer-email").value.trim();
+  const phone=document.getElementById("customer-phone").value.trim();
+
+  if(!email)return toast("Enter your email address");
+  if(!phone)return toast("Enter your phone number");
+  if(!reference)return toast("Enter payment reference");
+
+  const items=cart.map(x=>x.title);
+  const orderId="NV-"+Math.floor(100000+Math.random()*900000);
+
+  document.getElementById("pay-form").classList.add("hidden");
+  document.getElementById("pay-processing").classList.remove("hidden");
+
+  const order={
+    id:orderId,
+    amount:currentOrder.amount,
+    status:"processing",
+    email,
+    phone,
+    reference,
+    date:new Date().toLocaleString("en-IN"),
+    items
+  };
+
+  orders.unshift(order);
+  localStorage.setItem("nv_orders",JSON.stringify(orders));
+  currentOrder.id=orderId;
+  renderAdminOrders();
+
+  toast("Payment submitted for review");
+
+  // HTML-only mode: wait for the separate admin panel to approve/reject.
+  // The admin panel updates localStorage, and this page checks the status.
+  pollLocalOrderStatus(orderId);
+}
+
+function pollLocalOrderStatus(orderId){
+  const timer=setInterval(()=>{
+    try{
+      const saved=JSON.parse(localStorage.getItem("nv_orders")||"[]");
+      const order=saved.find(x=>x.id===orderId);
+
+      if(order && order.status==="approved"){
+        clearInterval(timer);
+        orders=saved;
+        approvePayment();
+      }
+
+      if(order && order.status==="rejected"){
+        clearInterval(timer);
+        orders=saved;
+        rejectPayment();
+      }
+    }catch(error){
+      console.error("Local order status check failed",error);
+    }
+  },2000);
+}
+
+async function pollOrderStatus(orderId){
+  const timer=setInterval(async()=>{
+    try{
+      const response=await fetch("/api/orders/"+encodeURIComponent(orderId));
+      const data=await response.json();
+
+      if(data.status==="approved"){
+        clearInterval(timer);
+        approvePayment();
+      }
+
+      if(data.status==="rejected"){
+        clearInterval(timer);
+        rejectPayment();
+      }
+    }catch(error){
+      console.error("Status check failed",error);
+    }
+  },3000);
+}
+function resetPayment(){
+  ["pay-form","pay-processing","pay-approved","pay-rejected"].forEach(id=>document.getElementById(id).classList.add("hidden"));
+  document.getElementById("pay-form").classList.remove("hidden");
+  document.getElementById("customer-email").value="";
+  document.getElementById("customer-phone").value="";
+  document.getElementById("reference").value="";
+}
+function approvePayment(){
+  document.getElementById("pay-processing").classList.add("hidden");
+  document.getElementById("pay-approved").classList.remove("hidden");
+  if(currentOrder?.id){const o=orders.find(x=>x.id===currentOrder.id);if(o){o.status="approved";localStorage.setItem("nv_orders",JSON.stringify(orders));}}
+  cart=[];discount=0;updateCart();renderAdminOrders();
+}
+function rejectPayment(){
+  document.getElementById("pay-processing").classList.add("hidden");
+  document.getElementById("pay-rejected").classList.remove("hidden");
+  if(currentOrder?.id){const o=orders.find(x=>x.id===currentOrder.id);if(o){o.status="rejected";localStorage.setItem("nv_orders",JSON.stringify(orders));}}
+  renderAdminOrders();
+}
+function openOrders(){document.getElementById("orders").innerHTML=orders.map(o=>`<div class="bg-zinc-900 rounded-2xl p-4 mb-3"><div class="flex justify-between"><b>${o.id}</b><span class="text-yellow-400">${o.status}</span></div><p class="text-xs text-zinc-500 mt-2">${o.date} • ${money(o.amount)}</p></div>`).join("")||`<p class="text-center text-zinc-500 py-10">No orders yet.</p>`;document.getElementById("orders-modal").classList.add("active")}
+function closeOrders(){document.getElementById("orders-modal").classList.remove("active")}
+function toggleTheme(){document.body.classList.toggle("light");localStorage.setItem("nv_theme",document.body.classList.contains("light")?"light":"dark")}
+function activity(){document.getElementById("activity").innerHTML=["A new digital product was discovered","A customer added an item to wishlist","A new order was placed","A product is trending now"].map((x,i)=>`<div class="flex gap-3 text-xs"><span>🟢</span><span>${x}<small class="block text-zinc-600 mt-1">${i+1} minutes ago</small></span></div>`).join("")}
+
+function openAdminPanel(){
+  renderAdminOrders();
+  document.getElementById("admin-modal").classList.add("active");
+}
+function closeAdminPanel(){document.getElementById("admin-modal").classList.remove("active")}
+function renderAdminOrders(){
+  const pending=orders.filter(o=>o.status==="processing").length;
+  const approved=orders.filter(o=>o.status==="approved").length;
+  const rejected=orders.filter(o=>o.status==="rejected").length;
+  document.getElementById("admin-pending").innerText=pending;
+  document.getElementById("admin-approved").innerText=approved;
+  document.getElementById("admin-rejected").innerText=rejected;
+  document.getElementById("admin-orders").innerHTML=orders.map(o=>`
+    <div class="bg-zinc-900 rounded-2xl p-4 mb-3">
+      <div class="flex justify-between gap-3">
+        <div><b class="text-sm">${o.id}</b><p class="text-[10px] text-zinc-500 mt-1">${o.date||""}</p></div>
+        <span class="${o.status==="approved"?"text-emerald-400":o.status==="rejected"?"text-red-400":"text-yellow-400"} text-xs font-black uppercase">${o.status}</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 text-xs mt-3 text-zinc-400">
+        <span>Amount: <b class="text-white">${money(o.amount)}</b></span>
+        <span>Email: <b class="text-white">${o.email||"—"}</b></span>
+        <span>Phone: <b class="text-white">${o.phone||"—"}</b></span>
+        <span>Items: <b class="text-white">${(o.items||[]).length}</b></span>
+      </div>
+      ${o.status==="processing"?`
+      <div class="flex gap-2 mt-4">
+        <button onclick="adminApprove('${o.id}')" class="flex-1 py-3 rounded-xl bg-emerald-600 text-[10px] font-black">✅ APPROVE</button>
+        <button onclick="adminReject('${o.id}')" class="flex-1 py-3 rounded-xl bg-red-600 text-[10px] font-black">❌ REJECT</button>
+      </div>`:""}
+    </div>`).join("")||`<p class="text-center text-zinc-500 py-10">No orders yet.</p>`;
+}
+function adminApprove(id){
+  const o=orders.find(x=>x.id===id);
+  if(!o)return;
+  o.status="approved";
+  localStorage.setItem("nv_orders",JSON.stringify(orders));
+  renderAdminOrders();
+  toast("YOUR ORDER DELIVERED IN YOUR MAIL");
+}
+function adminReject(id){
+  const o=orders.find(x=>x.id===id);
+  if(!o)return;
+  o.status="rejected";
+  localStorage.setItem("nv_orders",JSON.stringify(orders));
+  renderAdminOrders();
+  toast("REJECTED");
+}
+
+function init(){if(localStorage.getItem("nv_theme")==="light")document.body.classList.add("light");setCategory("ALL");updateCart();activity();setInterval(activity,10000);setInterval(()=>document.getElementById("online").innerText=120+Math.floor(Math.random()*20),5000)}
+init();
+</script>
+</body>
+</html>
